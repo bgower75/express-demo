@@ -11,12 +11,15 @@ const joi = require('@hapi/joi')
 //importing custom middleware functions
 const logger = require('./middleware/logger')
 //import the course router file
-const courses = require('./routes/courses')
+const courses = require('.routes/courses')
 //import the homepage router file
-const homepage = require('./routes/homepage')
+const homepage = require('routes/homepage')
 //importing express
 const express = require('express')
 const app = express()
+//calling use of environment variables
+require('dotenv').config()
+const authenticater = require('./middleware/authentication')
 
 //importing the template engine to return dynamic html to the client instead of json
 app.set('view engine', 'pug') //no need to enquire like other apps, express will load module from here
@@ -30,20 +33,34 @@ app.use(helmet())
 app.use('/api/courses', courses) //any routes starting /api/courses - use courses router
 app.use('/', homepage) //any routes starting /api - use homepage router
 
+app.use(logger); //calling a custom middleware function
+app.use(authenticater);
+
 //configuration
 console.log('App name: ' + config.get('name'));
 console.log('Mail server: ' + config.get('mail.host'));
+const port = process.env.PORT || 3000
+console.log(port);
+//******WHY WILL IT NOT READ FROM THE ENV FILE???? ********************************/
+console.log(debug);
+//******************************************************************************** */
+const nodeEnv = process.env.NODE_ENV
+if (process.env.NODE_ENV === undefined) {
+    process.env.NODE_ENV = 'development'
+}
+//getting the environment variable using process.env.NODE_ENV variable
+console.log(`NODE_ENV: ${ nodeEnv }`);
+//getting the environemnt variable using the app.get('env') - this reads whats in process.env.NODE_ENV
+console.log(`app: ${(app.get('env'))}`);
 
 //only log http requests when in development environment
-if (app.get('env') === 'development') {
-    app.use(morgan('tiny'))
-    //call the debugger function to log the console messages
-    debug("Morgan enabled");
-}
+// if (app.get('env') === 'development') {
+//     app.use(morgan('tiny'))
+//     //call the debugger function to log the console messages
+//     debug("Morgan enabled");
+//     return
+// }
 
-app.use(logger)
-
-const port = process.env.PORT || 3000
 app.listen(port, () => {
     console.log(`listening on port ${port}`);
 })
