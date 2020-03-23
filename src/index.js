@@ -9,7 +9,7 @@ const helmet = require('helmet')
 //input/output validation package
 const joi = require('@hapi/joi')
 //importing custom middleware functions
-const logger = require('./middleware/logger')
+const logger = require('../middleware/logger')
 //import the course router file
 const courses = require('./routes/courses')
 //import the homepage router file
